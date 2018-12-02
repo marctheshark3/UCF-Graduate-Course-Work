@@ -1,6 +1,28 @@
+#                              ------------<<<<<<<<<<< LIBRARY >>>>>>>>----------
+
 library(ISLR)
+library(MASS)
 library(glmnet)
 library(pls)
+library(pROC)
+library(ROCR)
+library(plotROC)
+library (leaps)
+library(caret)
+library(pryr)
+library(broom)
+library(dotwhisker)
+library("gridExtra")
+library(randomForest)
+library(tree)
+library(aod)
+library(ggplot2)
+library(naivebayes)
+library(bnclassify)
+library(logicFS)
+library(doParallel)
+#                              ------------<<<<<<<<<<< Data Input >>>>>>>>----------
+
 data <- read.csv('/Users/marctheshark/Documents/MODELING AND SIMULATION/Data Mining Methodology/Final Project/DataSet/UCF Dataset 2018 - Training set.csv')
 data$LoanNumber <- NULL
 data$VehicleMake <- NULL
@@ -12,10 +34,13 @@ data$RequestType <- NULL
 data$OccupancyStatus <- NULL
 
 set.seed(33)
-library (leaps)
-library(caret)
-library(pryr)
 
+
+
+
+
+
+#                              ------------<<<<<<<<<<< Data Processing >>>>>>>>----------
 
 #cleaning and preprocessing data
 nrows <- nrow(data)
@@ -34,115 +59,287 @@ is.factor(data$LTV)
 is.numeric(data$LTV)
 data$CoMonthlyLiability
 
-#Try to figure out the how to fix the predictors
-#sampling
+#sampling data
 samp <-sample(1:nrow(newdata), floor(0.8*nrow(newdata)))
 
 #creating test and training set
 
 training <- newdata[samp,]
-training.labels <- train$LoanStatus
+training.labels <- training$LoanStatus
 
 
 test <- newdata[-samp,]
 test.labels <- test$LoanStatus
 
-
+#relabeling our newdata
 data <- newdata
 
-library(aod)
-
-#logistic_reg = glm(data$LoanStatus~. , data = data, family = 'binomial')
-#summary(logistic_reg)
-
-#Random Forest
 
 
-rf <- train(LoanStatus~ModifiedCreditScore,data=test ,method = 'adaboost',preProc = c("center", "scale"))
+
+#Models to test
+
+#Best Models 24 is better than 25 according to CV
+mod24 = LoanStatus~Source + ModifiedCreditScore+ModifiedBankruptcyScore+EmployedMonths +CoEmployedMonths+PrimeMonthlyIncome+PrimeMonthlyLiability+TotalMonthlyDebtBeforeLoan+VehicleYear + VehicleMileage + isNewVehicle +TotalVehicleValue+AmountRequested+DownPayment+Loanterm +EstimatedMonthlyPayment+ NumberOfOpenRevolvingAccounts +DTI+MemberIndicator+CoApplicantIndicator
+mod25 = LoanStatus~Source + ModifiedCreditScore+ModifiedBankruptcyScore+EmployedMonths +CoEmployedMonths+TotalMonthlyIncome+PrimeMonthlyRent+PrimeMonthlyLiability+TotalMonthlyDebtBeforeLoan+VehicleYear + VehicleMileage + isNewVehicle +TotalVehicleValue+AmountRequested+DownPayment+Loanterm +EstimatedMonthlyPayment+NumberofOpenRevolvingAccounts+DTI+MemberIndicator+CoApplicantIndicator
+
+#Worst Model
+mod1 =  LoanStatus~ ModifiedCreditScore
+
+
+
+
+
+
+#                           --------  <<<<<<<<<<< Initial MODEL ANALYSIS >>>>> ----------
+
 
 #logtisitc Regression
-mod1 = LoanStatus~ModifiedCreditScore+EmploymentStatus+EmployedMonths+ModifiedBankruptcyScore+VehicleMileage+EstimatedMonthlyPayment
-mod2 = LoanStatus~ModifiedCreditScore+EmploymentStatus+EmployedMonths+ModifiedBankruptcyScore+VehicleMileage+EstimatedMonthlyPayment+Loanterm+TotalMonthlyIncome+EmployedMonths
-
-
 LogitisticRegression <- function(model){
-  lr <- glm(model,data = training , family = binomial)
+  lr <- glm(mod1,data = training , family = binomial)
   logit.pred <- predict(lr,test, type = 'response')
+  plot(lr)
   lr.prob <- ifelse(logit.pred > .5 , "Up" , "Down")
   t <- table(lr.prob,test$LoanStatus)
   acc = ((t[1]+t[4])/(t[1]+t[2]+t[3]+t[4]))
   #paste("This accuracy for is:", acc)
   acc
+  
+  return ( t)
 }
 
 
 #LDA
-library(MASS)
+
 LinearDiscrA <- function(model){
   l.fit <- lda(model,data = training)
-  l.fit
-  l.pred = predict(l.fit)
+  plot(l.fit)
+  l.pred = predict(l.fit, test, type= 'response')
   lda.class = l.pred$class
-  table(lda.class,training$LoanStatus)
+  t = table(lda.class,test$LoanStatus)
+  (mean(lda.class == test$LoanStatus))
   
-  
-return (mean(lda.class == training$LoanStatus))
+return (t)
 }
 
 #QDA
+
+
 QuadDiscrA <- function(model){
   q.fit = qda(model, data = training)
-  q.pred = predict(q.fit)
+  q.pred = predict(q.fit,test, type = 'response')
   qda.class = l.pred$class
-  table(qda.class,training$LoanStatus)
-  mean(qda.class == training$LoanStatus)
+  t = table(qda.class,test$LoanStatus)
+  mean(qda.class == test$LoanStatus)
+  
+  
+  return (t)
 }
 
-
-#SVM 
-library(e1071)
-svmfit = svm(mod1,data = training,kernel = 'linear', cost =10, scale = FALSE)
-plot(svmfit, training)
-ypred = predict(svmfit,test)
-table(ypred,test$LoanStatus)
-mean(ypred == test$LoanStatus) #50.44%
-
 #Tree-Based
-library(tree)
+
 simpleTree <- function(model){
   tree.based= tree(model, data= training)
   plot(tree.based)
   text(tree.based)
   
   tree.pred = predict(tree.based,test,type = 'class')
-  table(tree.pred,test$LoanStatus)
+  t = table(tree.pred,test$LoanStatus)
   mean(tree.pred == test$LoanStatus)
+  
+  
+  return (t)
 }
 
+
 #CV Tree Based
-tree.based= tree(model, data= training)
-#crossValidating to find the right number of nodes!
-cv.tree <- cv.tree(tree.based, FUN = prune.misclass)
-names(cv.tree)
-cv.tree
-par(mfrow=c(1,2))
+cv_tree <- function(model){
+  tree.based= tree(model, data= training)
+  #crossValidating to find the right number of nodes!
+  cv.tree <- cv.tree(tree.based, FUN = prune.misclass)
+  names(cv.tree)
+  cv.tree
+  par(mfrow=c(1,2))
+  
+  plot(cv.tree$size,cv.tree$dev,type = 'b')
+  plot(cv.tree$k,cv.tree$dev,type = 'b')
+  
+  
+  prune.tree <- prune.misclass(tree.based, best = 6)
+  plot(prune.tree)
+  text(prune.tree)
+  
+  prune.pred =predict(prune.tree,test, type= 'class')
+  t = table(prune.pred,test$LoanStatus)
+  mean(prune.pred == test$LoanStatus)
 
-plot(cv.tree$size,cv.tree$dev,type = 'b')
-plot(cv.tree$k,cv.tree$dev,type = 'b')
-
-
-prune.tree <- prune.misclass(tree.based, best = 5)
-plot(prune.tree)
-text(prune.tree)
-
-prune.pred =predict(prune.tree,test, type= 'class')
-table(prune.pred,test$LoanStatus)
-mean(prune.pred == test$LoanStatus)
+  
+  
+  return (t)
+  
+}
 
 
 #calling functions
-model = mod2
+model = mod1
 LogitisticRegression(model)
 LinearDiscrA(model)
 QuadDiscrA(model)
 simpleTree(model)
+cv_tree(model)
+
+
+all_models <- function(model){
+  lr = LogitisticRegression(model)
+  lda = LinearDiscrA(model)
+  qda = QuadDiscrA(model)
+  tree = simpleTree(model)
+  cross_valid_tr = cv_tree(model)
+  
+  acc <- function(t){
+    accuracy =((t[1]+t[4])/(t[1]+t[2]+t[3]+t[4]))
+    if (t == lr){
+      mod = "Logisitic Regession"
+    } else if (t == lda){
+      mod = "LDA"
+    }  else if (t == cross_valid_tr ) {
+      mod = "Cross Validated Pruned Tree"
+    } else if (t == qda){
+      mod = "QDA"
+    }else {
+      mod = "Tree Based Method" 
+    }
+      
+    paste( "The Accuracy for the",mod,"is", accuracy )
+  }
+  
+
+  a1 <- acc(lr)
+  a2 <- acc(lda)
+  a3 <- acc(qda)
+  a4 <- acc(tree)
+  a5 <- acc(cross_valid_tr)
+  return (cat("\n",a1,"\n", a2,"\n",a3,"\n",a4,"\n",a5,'\n'))
+  
+}
+all_models(model)
+
+
+ggplot(data,aes(d=data$ModifiedCreditScore , m= data$LoanStatus))+ geom_roc()
+
+#                              ------------<<<<<<<<<<< Density Graphs Data Exploration >>>>>>>>----------
+
+density_graphs <- function(){
+  
+  #2D Density Estimation
+  den2d<-ggplot(data ,aes(y= data$AmountRequested, x=data$ModifiedCreditScore ,color = data$LoanStatus, shape = data$LoanStatus))+geom_point() +scale_fill_manual(values = c('#800000','#191970'))+ stat_density_2d(aes(fill = data$LoanStatus), geom="polygon") + ylim(0,200000)
+  #Data with Regresion line (need to zoom in)
+  #ggplot(data ,aes(y= data$AmountRequested, x=data$ModifiedCreditScore ,color= data$LoanStatus, shape = data$LoanStatus))+geom_point() + geom_smooth(method = lm , aes(fill = data$LoanStatus)) + ylim(0,200000)
+  #Data eith Regressin line Zoomed In
+  ggplot(data ,aes(y= data$AmountRequested, x=data$ModifiedCreditScore ,color= data$LoanStatus, shape = data$LoanStatus))+geom_point() + geom_smooth(method = lm , aes(fill = data$LoanStatus)) + ylim(0,75000)
+  
+  densityY <- ggplot(data, aes(x = data$ModifiedCreditScore, fill=data$LoanStatus)) + 
+    geom_density(alpha=.5) + 
+    scale_fill_manual(values = c('#800000','#191970')) + 
+    theme(legend.position = "none")
+  
+  
+  densityX <- ggplot(data, aes(x = data$AmountRequested, fill=data$LoanStatus)) + 
+    geom_density(alpha=.5) + xlim(0,100000)+
+    scale_fill_manual(values = c('#800000','#191970')) + 
+    theme(legend.position = "none")
+  
+  
+  scatter <-  ggplot(data ,aes(y= data$AmountRequested, x=data$ModifiedCreditScore ,color = data$LoanStatus, shape = data$LoanStatus))+geom_point() +scale_fill_manual(values = c('#800000','#191970')) + ylim(0,150000)
+  
+  
+  return (grid.arrange(densityX, scatter, densityY,den2d, ncol= 2 , nrow = 2 ))
+  
+  }
+density_graphs()
+
+#                              ------------<<<<<<<<<<< Getting Results >>>>>>>>----------
+
+#setting up Caret Settings
+trellis.par.set(caretTheme()) 
+#having the train function use repeated 10fold CV
+control<-trainControl(method = "repeatedcv", number = 10)
+metric<-"Accuracy"
+set.seed(33)
+
+#setting up the parrallel processing 
+#DONT GO ABOVE 5!
+cl <- makePSOCKcluster(5)
+#telling the PC to use 5 cores
+registerDoParallel(cl)
+#telling the fitting functions that we want to test model 24
+model <- mod24
+#training our respective models for training
+fit.lda <- train(model, data=training, method="lda", metric=metric, trControl=control, allowParallel = T)
+fit.qda <- train(model, data=training, method="qda", metric=metric, trControl=control, allowParallel = T)
+fit.knn <- train(model, data=training, method="knn", metric=metric, trControl=control, allowParallel = T)
+
+fit.rf <- train(model, data=training, method="rf", metric=metric, trControl=control, allowParallel = T)
+fit.svm1 <- train(model, data=training, method="svmRadial", metric=metric, trControl=control, allowParallel = T)
+fit.svm2 <- train(model, data=training, method="svmLinear", metric=metric, trControl=control, allowParallel = T)
+fit.adaboost <- train(model, data=training, method="adaboost", metric=metric, trControl=control, allowParallel = T)
+
+#Getting Results
+results <- resamples(list(lda=fit.lda,qda=fit.qda, svm1=fit.svm1,svm2=fit.svm2,
+                          ada = fit.adaboost, rf= fit.rf))
+#summarizes Results
+summary(results)
+#plots Results
+dotplot(results)
+
+#predicting the models on the test dataset
+lda.pred <-postResample(predict(fit.lda, test), test$LoanStatus)
+qda.pred <-postResample(predict(fit.qda, test), test$LoanStatus)
+rf.pred <-postResample(predict(fit.rf, test), test$LoanStatus)
+svm1.pred <-postResample(predict(fit.svm1, test), test$LoanStatus)
+svm2.pred <-postResample(predict(fit.svm2, test), test$LoanStatus)
+ada.pred <-postResample(predict(fit.adaboost, test), test$LoanStatus)
+
+#getting the ROC Graphs for Results
+roc0 <- roc( test$LoanStatus, 
+            predict(fit.lda, test, type = "prob")[,1], 
+            levels = rev(levels(test$LoanStatus)))
+
+
+roc1 <- roc( test$LoanStatus, 
+             predict(fit.qda, test, type = "prob")[,1], 
+             levels = rev(levels(test$LoanStatus)))
+
+
+roc2 <- roc( test$LoanStatus, 
+             predict(fit.rf, test, type = "prob")[,1], 
+             levels = rev(levels(test$LoanStatus)))
+
+
+roc3 <- roc( test$LoanStatus, 
+             predict(fit.svm1, test, type = "prob")[,1], 
+             levels = rev(levels(test$LoanStatus)))
+
+
+roc4 <- roc( test$LoanStatus, 
+             predict(fit.svm2, test, type = "prob")[,1], 
+             levels = rev(levels(test$LoanStatus)))
+
+
+roc5 <- roc( test$LoanStatus, 
+             predict(fit.adaboost, test, type = "prob")[,1], 
+             levels = rev(levels(test$LoanStatus)))
+
+#calling the roc plots we just made and plotting all of them
+plot(roc1, print.thres = c(.5), type = "S")
+lines(roc0, col = 'purple', type = 's')
+lines(roc2, col = 'red', type='o')
+#lines(roc3, col = 'blue')
+#lines(roc4, col = 'gree')
+lines(roc5, col = 'orange', type = 's')
+legend('right',legend = c('LDA','QDA', 'Random Forest', 'AdaBoost'), fill = c('purple', 'black','red','yellow'))
+title(main= '\n Single Model ROC Results')
+
+#turns off Parallel Processing
+stopCluster(cl)
+
