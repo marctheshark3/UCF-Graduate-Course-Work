@@ -1,5 +1,14 @@
 
 # Fusion 360 Design Links:
 
-Otto: Intelligent System:
-https://myhub.autodesk360.com/ue2ba43a9/g/shares/SHabee1QT1a327cf2b7a2dc33ac1995c84be?viewState=NoIgbgDAdAjCA0IDeAdEAXAngBwKZoC40ARXAZwEsBzAOzXjQEMyzd1C0AmCATkYHYeADgAmAWgBGANhHiALJx4BjSTPFSpS-gFYAZkqk8JAZiVoAviAC6QA
+#### Otto: Intelligent System:
+https://a360.co/2uYCNnE
+
+#### E-ink esp32 Display:
+https://a360.co/2P6vELA
+
+#### Hanging Plant Holder:
+https://a360.co/2P6HmWn
+
+#### Fishing Reel For Cats:
+https://a360.co/2P3nymJ
