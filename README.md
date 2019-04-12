@@ -1,14 +1,16 @@
 # UCF-Graduate-Course-Work
 
-The attached files are course work worked by Marc Mailloux while attending UCF for Master's Degree in Modeling and Simulation. 
+The attached files are projects from the courses taken by Marc Mailloux while attending UCF for Master's Degree in Modeling and Simulation. 
 
 ## Table of Contents:
 
 #### Data Mining 
 - CFE Loan Classification Competition
+- Programming in R
 
 #### Data Visualization
 - Real Eastate data exploration
+- - Programming in R
 
 #### Huzzah32 Projects 
 - Sample Code Projects using a few sensors and MQTT protocol
@@ -17,28 +19,41 @@ The attached files are course work worked by Marc Mailloux while attending UCF f
 - Work in Progress
 - Currently getting openCV on rpi 3 B+.
 - PCB's and electronic components were ordered
+- MQTT Broker - RPI Zero running Mosquito
+- - Programming in Arduino IDE
 
 #### Machine Learning
-- Sample Projects from UCF's ML Course
+- Sample Projects from UCFs ML Course
   - Glass dataset
   - Mushroom Dataset
+  - - Programming in Python
 
 #### Natural Langauge Processing
-- Sample Projects from UCF's NLP course
+- Sample Projects from UCFs NLP course
    - Hw assignments 
    - HW 1 - conceptual & word2vec
    - HW 2 - conceptual & N-grams
    - HW 3 - conceptual
+    - Programming in Python
 
 #### Perspectives in M&S
-- The next electricity paper
+- AI the next electricity Literature Review
 
 #### Research Practicum
-- VR Case study
+- Virtual Reality Attention Restoration  Case study
+ - Does using VR
 
 #### Simulation Techniques
-- Drone Case Study
+- Drone Delivery Study
+ - Monte - Carlo Simulation
+ - Programming in Python
 
+#### Human Systems Integration
+- Using HSI methodology in Intelligent Systems
+	- Paper and Presentation
+
+#### CAD models
+- Various project models
 
 
 
