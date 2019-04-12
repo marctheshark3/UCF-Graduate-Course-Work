@@ -10,7 +10,7 @@ The attached files are projects from the courses taken by Marc Mailloux while at
 
 #### Data Visualization
 - Real Eastate data exploration
-- - Programming in R
+- Programming in R
 
 #### Huzzah32 Projects 
 - Sample Code Projects using a few sensors and MQTT protocol
@@ -20,13 +20,13 @@ The attached files are projects from the courses taken by Marc Mailloux while at
 - Currently getting openCV on rpi 3 B+.
 - PCB's and electronic components were ordered
 - MQTT Broker - RPI Zero running Mosquito
-- - Programming in Arduino IDE
+- Programming in Arduino IDE
 
 #### Machine Learning
 - Sample Projects from UCFs ML Course
   - Glass dataset
   - Mushroom Dataset
-  - - Programming in Python
+  -  Programming in Python
 
 #### Natural Langauge Processing
 - Sample Projects from UCFs NLP course
@@ -40,8 +40,8 @@ The attached files are projects from the courses taken by Marc Mailloux while at
 - AI the next electricity Literature Review
 
 #### Research Practicum
-- Virtual Reality Attention Restoration  Case study
- - Does using VR
+- Virtual Reality Attention Restoration Case study
+
 
 #### Simulation Techniques
 - Drone Delivery Study
@@ -53,7 +53,7 @@ The attached files are projects from the courses taken by Marc Mailloux while at
 	- Paper and Presentation
 
 #### CAD models
-- Various project models
+- Various project models with links
 
 
 
