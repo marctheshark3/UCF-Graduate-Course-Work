@@ -11,8 +11,11 @@ https://a360.co/2P6vELA
 #### Hanging Plant Holder:
 https://a360.co/2P6HmWn
 
-#### Fishing Reel For Cats (work in progress):
-https://a360.co/2P3nymJ
+#### Fishing Reel For Cats (work in progress, Latest):
+https://a360.co/32noYyC
+
+#### Fishing Reel for Cats Old Version
+https://a360.co/2LT4yYz
 
 #### Moon-Planter
 https://a360.co/2uX7bPz
@@ -22,3 +25,18 @@ https://a360.co/2UMpA02
 
 #### Ikea Tin Can Wall Mount
 https://a360.co/2uZ7OIb
+
+#### Euphorbia Plant Scan
+https://a360.co/32rotnd
+
+#### Thread Test
+https://a360.co/32ofFyv
+
+#### Pi Zero Case
+https://a360.co/2LRrhV4
+
+#### Turtle Shell Scan
+https://a360.co/2LRj6rR
+
+#### Snap Fit Box Template
+https://a360.co/2LNHpXu
